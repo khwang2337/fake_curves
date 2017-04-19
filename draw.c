@@ -47,7 +47,6 @@ triangles
 ====================*/
 void draw_polygons( struct matrix *polygons, screen s, color c ) { 
   int counter;
-  printf("lastcol: %d\n", polygons->lastcol);
   for (counter = 0; counter < polygons->lastcol; counter += 3) {
     draw_line(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], s, c);
     draw_line(polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2], s, c);
@@ -115,7 +114,6 @@ void add_sphere( struct matrix * edges, //rip EDGE MATRIX
 		 double r, double step ) {
   struct matrix *points = generate_sphere(cx, cy, cz, r, step);
   int num_steps = (int)(1/step +0.1);
-  printf("num_steps: %d\n", num_steps);
   int index, lat, longt;
   int latStop, longStop, latStart, longStart;
 
@@ -255,7 +253,6 @@ void add_torus( struct matrix * edges,
   
   struct matrix *points = generate_torus(cx, cy, cz, r1, r2, step);
   int num_steps = (int)(1/step +0.1);
-  printf("num_steps: %d\n", num_steps);
   int index, lat, longt;
   int latStop, longStop, latStart, longStart;
   latStart = 0;
@@ -273,7 +270,6 @@ void add_torus( struct matrix * edges,
       index = lat * (num_steps) + longt;
       if (lat == num_steps - 1) {
         if (longt == num_steps - 1) {
-          printf("in extreme\n");
             add_polygon(edges,
             points->m[0][index],
         		points->m[1][index],
@@ -284,10 +280,6 @@ void add_torus( struct matrix * edges,
         		points->m[0][longt],
         		points->m[1][longt],
         		points->m[2][longt]);
-        		printf("longt: %d\n", longt);
-        		printf("3rd pt x: %lf\n", points->m[0][longt]);
-        		printf("3rd pt y: %lf\n", points->m[1][longt]);
-        		printf("3rd pt z: %lf\n\n", points->m[2][longt]);
         }
         else {
           add_polygon(edges,
@@ -300,10 +292,6 @@ void add_torus( struct matrix * edges,
         		points->m[0][longt],
         		points->m[1][longt],
         		points->m[2][longt]);
-        		printf("longt: %d\n", longt);
-        		printf("3rd pt x: %lf\n", points->m[0][longt]);
-        		printf("3rd pt y: %lf\n", points->m[1][longt]);
-        		printf("3rd pt z: %lf\n\n", points->m[2][longt]);
         }
       }
       else {
@@ -374,9 +362,7 @@ struct matrix * generate_torus( double cx, double cy, double cz,
       y = r1 * sin(2*M_PI * circ) + cy;
       z = -1*sin(2*M_PI * rot) *
 	(r1 * cos(2*M_PI * circ) + r2) + cz;
-      
-      //printf("rotation: %d\tcircle: %d\n", rotation, circle);
-      //printf("torus point: (%0.2f, %0.2f, %0.2f)\n", x, y, z);
+	
       add_point(points, x, y, z);
     }
   }
