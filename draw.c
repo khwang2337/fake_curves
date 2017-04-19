@@ -36,6 +36,18 @@ void add_polygon( struct matrix *polygons,
 	
 }
 
+double check_face (double x0, double y0, double x1, double y1, double x2, double y2) { //process of simplification
+  double aX, bX, aY, bY;
+  aX = x1 - x0;
+  bX = x2 - x0;
+  aY = y1 - y0;
+  bY = y2 - y0;
+  
+  return aY * bX - aX * bY < 0; 
+  
+  return (y1 - y0) * (x2 - x0) - (x1 - x0) * (y2 - y0) < 0;
+}
+
 /*======== void draw_polygons() ==========
 Inputs:   struct matrix *polygons
           screen s
@@ -48,11 +60,17 @@ triangles
 void draw_polygons( struct matrix *polygons, screen s, color c ) { 
   int counter;
   for (counter = 0; counter < polygons->lastcol; counter += 3) {
-    draw_line(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], s, c);
-    draw_line(polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2], s, c);
-    draw_line(polygons->m[0][counter+2], polygons->m[1][counter+2], polygons->m[0][counter], polygons->m[1][counter], s, c);
+    //if (check_face(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2])) {
+    if ( (polygons->m[1][counter+1] - polygons->m[1][counter]) * (polygons->m[0][counter+2] - polygons->m[0][counter]) 
+          - (polygons->m[0][counter+1] - polygons->m[0][counter]) * (polygons->m[1][counter+2] - polygons->m[1][counter]) < 0) {
+            
+      draw_line(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], s, c);
+      draw_line(polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2], s, c);
+      draw_line(polygons->m[0][counter+2], polygons->m[1][counter+2], polygons->m[0][counter], polygons->m[1][counter], s, c);
+    }
   }
 }
+
 
 
 /*======== void add_box() ==========
