@@ -43,9 +43,9 @@ double check_face (double x0, double y0, double x1, double y1, double x2, double
   aY = y1 - y0;
   bY = y2 - y0;
   
-  return aY * bX - aX * bY < 0; 
+  return (aY * bX - aX * bY) < 0; 
   
-  return (y1 - y0) * (x2 - x0) - (x1 - x0) * (y2 - y0) < 0;
+  //return (y1 - y0) * (x2 - x0) - (x1 - x0) * (y2 - y0) < 0;
 }
 
 /*======== void draw_polygons() ==========
@@ -60,9 +60,9 @@ triangles
 void draw_polygons( struct matrix *polygons, screen s, color c ) { 
   int counter;
   for (counter = 0; counter < polygons->lastcol; counter += 3) {
-    //if (check_face(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2])) {
-    if ( (polygons->m[1][counter+1] - polygons->m[1][counter]) * (polygons->m[0][counter+2] - polygons->m[0][counter]) 
-          - (polygons->m[0][counter+1] - polygons->m[0][counter]) * (polygons->m[1][counter+2] - polygons->m[1][counter]) < 0) {
+    if (check_face(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2])) {
+    //if ( (polygons->m[1][counter+1] - polygons->m[1][counter]) * (polygons->m[0][counter+2] - polygons->m[0][counter]) 
+    //     - (polygons->m[0][counter+1] - polygons->m[0][counter]) * (polygons->m[1][counter+2] - polygons->m[1][counter]) < 0) {
             
       draw_line(polygons->m[0][counter], polygons->m[1][counter], polygons->m[0][counter+1], polygons->m[1][counter+1], s, c);
       draw_line(polygons->m[0][counter+1], polygons->m[1][counter+1], polygons->m[0][counter+2], polygons->m[1][counter+2], s, c);
@@ -99,17 +99,26 @@ void add_box( struct matrix * edges,
   z0 = z;
   z1 = z-depth;
 
-  //front
-  add_edge(edges, x0, y0, z0, x0+2, y0+2, z0+2);
-  add_edge(edges, x1, y0, z0, x1+2, y0+2, z0+2);
-  add_edge(edges, x1, y1, z0, x1+2, y1+2, z0+2);
-  add_edge(edges, x0, y1, z0, x0+2, y1+2, z0+2);
-
-  //back
-  add_edge(edges, x0, y0, z1, x0+2, y0+2, z1+2);
-  add_edge(edges, x1, y0, z1, x1+2, y0+2, z1+2);
-  add_edge(edges, x1, y1, z1, x1+2, y1+2, z1+2);
-  add_edge(edges, x0, y1, z1, x0+2, y1+2, z1+2);
+  add_polygon(edges, x0, y0, z0, x0, y0, z1, x0, y1, z1); //x0 LEFT
+  add_polygon(edges, x0, y0, z0, x0, y1, z0, x0, y1, z1); //x0 LEFT
+  
+  add_polygon(edges, x1, y0, z0, x1, y1, z0, x1, y0, z1); //x1 RIGHT
+  add_polygon(edges, x1, y1, z1, x1, y1, z0, x1, y0, z1); //x1 RIGHT
+  
+  add_polygon(edges, x0, y0, z1, x1, y0, z1, x0, y0, z0); //y0 TOP
+  add_polygon(edges, x1, y0, z0, x1, y0, z1, x0, y0, z0); //y0 TOP
+  
+  add_polygon(edges, x0, y1, z0, x1, y1, z0, x0, y1, z1); //y1 BOT
+  add_polygon(edges, x1, y1, z1, x1, y1, z0, x0, y1, z1); //y1 BOT
+  
+  add_polygon(edges, x0, y0, z0, x1, y0, z0, x0, y1, z0); //z0 FRONT
+  add_polygon(edges, x1, y1, z0, x1, y0, z0, x1, y1, z0); //z0 FRONT
+  
+  add_polygon(edges, x1, y0, z1, x0, y0, z1, x1, y1, z1); //z1 BACK
+  add_polygon(edges, x0, y1, z1, x0, y0, z1, x1, y1, z1); //z1 BACK
+  
+  
+  
 }
 
 /*======== void add_sphere() ==========

@@ -95,7 +95,7 @@ void parse_file ( char * filename,
     double theta;
     char axis;
     int type;
-    double step = 0.035;
+    double step = 0.015;
 
     if ( strncmp(line, "box", strlen(line)) == 0 ) {
       fgets(line, sizeof(line), f);
@@ -106,6 +106,7 @@ void parse_file ( char * filename,
 	     xvals+1, yvals+1, zvals+1);
       add_box(edges, xvals[0], yvals[0], zvals[0],
 	      xvals[1], yvals[1], zvals[1]);
+	    draw_polygons(edges, s, c);
     }//end of box
 
     else if ( strncmp(line, "sphere", strlen(line)) == 0 ) {
