@@ -8,6 +8,7 @@
 #include "draw.h"
 #include "matrix.h"
 #include "parser.h"
+#include "stack.h"
 
 
 /*======== void parse_file () ==========
@@ -65,7 +66,7 @@ be sure to conver those degrees to radians (M_PI is the constant
 for PI)
 ====================*/
 void parse_file ( char * filename, 
-                  struct matrix * transform, 
+                  struct stack * coords, 
                   struct matrix * edges,
                   screen s) {
 
@@ -95,8 +96,21 @@ void parse_file ( char * filename,
     double theta;
     char axis;
     int type;
-    double step = 0.015;
-
+    double step = 0.0375;
+    
+    if ( strncmp(line, "push", strlen(line)) == 0 ) {
+      edges->lastcol = 0;
+      push(coords);
+    }
+    
+    if ( strncmp(line, "pop", strlen(line)) == 0 ) {
+      edges->lastcol = 0;
+      pop(coords);
+    }
+    
+    
+    
+    
     if ( strncmp(line, "box", strlen(line)) == 0 ) {
       fgets(line, sizeof(line), f);
       //printf("BOX\t%s", line);
@@ -106,6 +120,7 @@ void parse_file ( char * filename,
 	     xvals+1, yvals+1, zvals+1);
       add_box(edges, xvals[0], yvals[0], zvals[0],
 	      xvals[1], yvals[1], zvals[1]);
+	    matrix_mult(coords->data[coords->top], edges);
 	    draw_polygons(edges, s, c);
     }//end of box
 
@@ -115,6 +130,7 @@ void parse_file ( char * filename,
       sscanf(line, "%lf %lf %lf %lf",
 	     xvals, yvals, zvals, &r);
       add_sphere( edges, xvals[0], yvals[0], zvals[0], r, step);
+      matrix_mult(coords->data[coords->top], edges);
       draw_polygons(edges, s, c);
     }//end of sphere
 
@@ -125,6 +141,8 @@ void parse_file ( char * filename,
       sscanf(line, "%lf %lf %lf %lf %lf",
 	     xvals, yvals, zvals, &r, &r1);
       add_torus( edges, xvals[0], yvals[0], zvals[0], r, r1, step);
+      matrix_mult(coords->data[coords->top], edges);
+      draw_polygons(edges, s, c);
     }//end of torus
 
     else if ( strncmp(line, "circle", strlen(line)) == 0 ) {
@@ -182,7 +200,8 @@ void parse_file ( char * filename,
       /* printf("%lf %lf %lf\n", */
       /* 	xvals[0], yvals[0], zvals[0]); */ 
       tmp = make_scale( xvals[0], yvals[0], zvals[0]);
-      matrix_mult(tmp, transform);
+      matrix_mult(coords->data[coords->top], tmp);
+      copy_matrix(tmp, coords->data[coords->top]);
     }//end scale
 
     else if ( strncmp(line, "move", strlen(line)) == 0 ) {
@@ -193,7 +212,8 @@ void parse_file ( char * filename,
       /* printf("%lf %lf %lf\n", */
       /* 	xvals[0], yvals[0], zvals[0]); */ 
       tmp = make_translate( xvals[0], yvals[0], zvals[0]);
-      matrix_mult(tmp, transform);
+      matrix_mult(coords->data[coords->top], tmp);
+      copy_matrix(tmp, coords->data[coords->top]);
     }//end translate
 
     else if ( strncmp(line, "rotate", strlen(line)) == 0 ) {
@@ -211,7 +231,8 @@ void parse_file ( char * filename,
       else 
 	tmp = make_rotZ( theta );
       
-      matrix_mult(tmp, transform);
+      matrix_mult(coords->data[coords->top], tmp);
+      copy_matrix(tmp, coords->data[coords->top]);
     }//end rotate
 
     else if ( strncmp(line, "clear", strlen(line)) == 0 ) {
@@ -221,18 +242,18 @@ void parse_file ( char * filename,
 
     else if ( strncmp(line, "ident", strlen(line)) == 0 ) {
       //printf("IDENT\t%s", line);
-      ident(transform);
+      ident(coords->data[coords->top]);
     }//end ident
     
     else if ( strncmp(line, "apply", strlen(line)) == 0 ) {
       //printf("APPLY\t%s", line);
-      matrix_mult(transform, edges);
+      matrix_mult(coords->data[coords->top], edges);
     }//end apply
     
     else if ( strncmp(line, "display", strlen(line)) == 0 ) {
       //printf("DISPLAY\t%s", line);
-      clear_screen(s);
-      draw_lines(edges, s, c);
+      //clear_screen(s);
+      //draw_lines(edges, s, c);
       display( s );
     }//end display
 
@@ -240,8 +261,7 @@ void parse_file ( char * filename,
       fgets(line, sizeof(line), f);
       *strchr(line, '\n') = 0;
       //printf("SAVE\t%s\n", line);
-      clear_screen(s);
-      draw_polygons(edges, s, c);
+      //print_matrix(edges);
       save_extension(s, line);
     }//end save
     

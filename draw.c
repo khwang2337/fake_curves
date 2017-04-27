@@ -36,14 +36,15 @@ void add_polygon( struct matrix *polygons,
 	
 }
 
-double check_face (double x0, double y0, double x1, double y1, double x2, double y2) { //process of simplification
+int check_face (double x0, double y0, double x1, double y1, double x2, double y2) { //process of simplification
   double aX, bX, aY, bY;
   aX = x1 - x0;
   bX = x2 - x0;
   aY = y1 - y0;
   bY = y2 - y0;
   
-  return (aY * bX - aX * bY) < 0; 
+  if ( (aY * bX - aX * bY) > 0 ) return 1;
+  else return 0;
   
   //return (y1 - y0) * (x2 - x0) - (x1 - x0) * (y2 - y0) < 0;
 }
@@ -69,6 +70,7 @@ void draw_polygons( struct matrix *polygons, screen s, color c ) {
       draw_line(polygons->m[0][counter+2], polygons->m[1][counter+2], polygons->m[0][counter], polygons->m[1][counter], s, c);
     }
   }
+  
 }
 
 
@@ -98,7 +100,7 @@ void add_box( struct matrix * edges,
   y1 = y-height;
   z0 = z;
   z1 = z-depth;
-
+  /*
   add_polygon(edges, x0, y0, z0, x0, y0, z1, x0, y1, z1); //x0 LEFT
   add_polygon(edges, x0, y0, z0, x0, y1, z0, x0, y1, z1); //x0 LEFT
   
@@ -116,7 +118,20 @@ void add_box( struct matrix * edges,
   
   add_polygon(edges, x1, y0, z1, x0, y0, z1, x1, y1, z1); //z1 BACK
   add_polygon(edges, x0, y1, z1, x0, y0, z1, x1, y1, z1); //z1 BACK
+  */
   
+  add_polygon(edges, x0, y0, z0, x0, y1, z0, x1, y1, z0);
+  add_polygon(edges, x1, y1, z0, x1, y0, z0, x0, y0, z0);
+  add_polygon(edges, x1, y0, z0, x1, y1, z0, x1, y1, z1);
+  add_polygon(edges, x1, y1, z1, x1, y0, z1, x1, y0, z0);
+  add_polygon(edges, x1, y0, z1, x1, y1, z1, x0, y1, z1);
+  add_polygon(edges, x0, y1, z1, x0, y0, z1, x1, y0, z1);
+  add_polygon(edges, x0, y0, z1, x0, y1, z1, x0, y1, z0);
+  add_polygon(edges, x0, y1, z0, x0, y0, z0, x0, y0, z1);
+  add_polygon(edges, x0, y0, z1, x0, y0, z0, x1, y0, z0);
+  add_polygon(edges, x1, y0, z0, x1, y0, z1, x0, y0, z1);
+  add_polygon(edges, x1, y1, z1, x1, y1, z0, x0, y1, z0);
+  add_polygon(edges, x0, y1, z0, x0, y1, z1, x1, y1, z1);
   
   
 }

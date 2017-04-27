@@ -362,5 +362,7 @@ void copy_matrix(struct matrix *a, struct matrix *b) {
   for (r=0; r < a->rows; r++) 
     for (c=0; c < a->cols; c++)  
       b->m[r][c] = a->m[r][c];  
+  
+  b->lastcol = a->lastcol;
 }
 
